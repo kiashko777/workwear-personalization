@@ -1,0 +1,22 @@
+enum WorkwearApplicationType {
+    EMBROIDERY @doc(description: "Embroidered logo or text")
+    PRINT @doc(description: "Printed logo or text")
+}
+
+enum WorkwearContentType {
+    LOGO @doc(description: "Image logo uploaded via REST API")
+    TEXT @doc(description: "Custom text lines")
+}
+
+input WorkwearPersonalizationInput @doc(description: "Single personalization entry for a garment position") {
+    position_code: String! @doc(description: "Position code, e.g. LEFT_CHEST. Must be configured on the product.")
+    application_type: WorkwearApplicationType! @doc(description: "Embroidery or print")
+    content_type: WorkwearContentType! @doc(description: "Logo file or text")
+    logo_uid: String @doc(description: "logo_uid returned by REST upload endpoint. Required when content_type is LOGO.")
+    text_lines: [String] @doc(description: "Up to 3 text lines, each max 22 characters. Required when content_type is TEXT.")
+    font_family: String @doc(description: "Optional font family for text personalizations")
+}
+
+extend input CartItemUpdateInput {
+    personalizations: [WorkwearPersonalizationInput] @doc(description: "Workwear logo and text personalizations for this cart item")
+}

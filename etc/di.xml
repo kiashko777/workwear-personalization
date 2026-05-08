@@ -7,4 +7,5 @@
                 type="Workwear\Personalization\Model\Data\LogoUploadResult"/>
     <preference for="Workwear\Personalization\Api\Data\CustomerLogoInterface"
                 type="Workwear\Personalization\Model\Data\CustomerLogoData"/>
+
 </config>
