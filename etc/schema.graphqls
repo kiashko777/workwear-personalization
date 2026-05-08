@@ -20,3 +20,15 @@ input WorkwearPersonalizationInput @doc(description: "Single personalization ent
 extend input CartItemUpdateInput {
     personalizations: [WorkwearPersonalizationInput] @doc(description: "Workwear logo and text personalizations for this cart item")
 }
+
+type WorkwearAvailablePosition @doc(description: "Personalization position available for a product") {
+    position_code: String! @doc(description: "Position code, e.g. LEFT_CHEST")
+}
+
+interface ProductInterface {
+    available_positions: [WorkwearAvailablePosition!] @doc(description: "Personalization positions available for this product") @resolver(class: "\\Workwear\\Personalization\\Model\\Resolver\\AvailablePositions")
+}
+
+extend type CartPrices {
+    personalization_fee: Money @doc(description: "Total personalization setup fee charged on this cart") @resolver(class: "\\Workwear\\Personalization\\Model\\Resolver\\PersonalizationFeeResolver")
+}
