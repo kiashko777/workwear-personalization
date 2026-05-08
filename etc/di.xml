@@ -8,4 +8,10 @@
     <preference for="Workwear\Personalization\Api\Data\CustomerLogoInterface"
                 type="Workwear\Personalization\Model\Data\CustomerLogoData"/>
 
+    <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
+        <plugin name="workwear_personalization_quote_item_to_order_item"
+                type="Workwear\Personalization\Plugin\Quote\Item\ToOrderItemPlugin"
+                sortOrder="10"/>
+    </type>
+
 </config>
