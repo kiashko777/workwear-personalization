@@ -32,3 +32,15 @@ interface ProductInterface {
 extend type CartPrices {
     personalization_fee: Money @doc(description: "Total personalization setup fee charged on this cart") @resolver(class: "\\Workwear\\Personalization\\Model\\Resolver\\PersonalizationFeeResolver")
 }
+
+type WorkwearCustomerLogo @doc(description: "A logo uploaded by the customer") {
+    uid: String! @doc(description: "Unique identifier (SHA-256 hash) returned by the upload endpoint")
+    url: String! @doc(description: "Absolute URL to the logo file in media storage")
+    filename: String! @doc(description: "Original filename derived from the stored path")
+    status: String! @doc(description: "Approval status: pending, approved, or rejected")
+    created_at: String! @doc(description: "ISO-8601 timestamp when the logo was uploaded")
+}
+
+extend type Query {
+    customerLogos: [WorkwearCustomerLogo!]! @doc(description: "Returns all logos uploaded by the authenticated customer") @resolver(class: "\\Workwear\\Personalization\\Model\\Resolver\\CustomerLogosResolver") @cache(cacheable: false)
+}
