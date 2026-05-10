@@ -455,6 +455,17 @@ query GetProduct($sku: String!) {
   }
 }
 
+# Customer logo library (requires auth)
+query GetCustomerLogos {
+  customerLogos {
+    uid         # SHA-256 hash — use as logo_uid in cart mutations
+    url         # absolute media URL for preview
+    filename
+    status      # "pending" | "approved" | "rejected"
+    created_at
+  }
+}
+
 # Add personalization to cart item
 mutation UpdateCartItemWithPersonalization { ... }
 
@@ -482,6 +493,7 @@ POST /rest/V1/workwear/logo/upload
 GET /rest/V1/workwear/logos/mine
   Auth: Bearer <customer_token>
   Returns: [{ logo_uid, file_path, status, created_at }]
+  Note: prefer GraphQL customerLogos query — richer response, no extra round-trip
 ```
 
 ---
@@ -506,4 +518,5 @@ Update this section as phases complete:
 [x] Phase 5: Quote→Order        — plugin wired (live checkout not exercised)
 [x] Phase 6: Admin Grid         — mass approve dispatches event
 [x] Phase 7: Email              — observer fires; needs SMTP module in env to deliver
+[x] Post-phases: customerLogos GraphQL query — CustomerLogosResolver + schema type added; frontend gap closed
 ```
