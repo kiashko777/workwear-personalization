@@ -33,6 +33,10 @@ extend type CartPrices {
     personalization_fee: Money @doc(description: "Total personalization setup fee charged on this cart") @resolver(class: "\\Workwear\\Personalization\\Model\\Resolver\\PersonalizationFeeResolver")
 }
 
+extend interface CartItemInterface {
+    personalization_data: String @doc(description: "JSON-encoded personalization entries for this cart item, null if none") @resolver(class: "\\Workwear\\Personalization\\Model\\Resolver\\CartItemPersonalizationData")
+}
+
 type WorkwearCustomerLogo @doc(description: "A logo uploaded by the customer") {
     uid: String! @doc(description: "Unique identifier (SHA-256 hash) returned by the upload endpoint")
     url: String! @doc(description: "Absolute URL to the logo file in media storage")

@@ -4,11 +4,21 @@ declare(strict_types=1);
 
 namespace Workwear\Personalization\Plugin\Quote\Item;
 
+use Magento\Framework\UrlInterface;
 use Magento\Quote\Model\Quote\Item\ToOrderItem;
 use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Workwear\Personalization\Model\CustomerLogoFactory;
+use Workwear\Personalization\Model\ResourceModel\CustomerLogo as CustomerLogoResource;
 
 class ToOrderItemPlugin
 {
+    public function __construct(
+        private readonly CustomerLogoFactory $customerLogoFactory,
+        private readonly CustomerLogoResource $customerLogoResource,
+        private readonly StoreManagerInterface $storeManager
+    ) {}
+
     public function aroundConvert(ToOrderItem $subject, callable $proceed, $item, $data = []): OrderItemInterface
     {
         /** @var OrderItemInterface $orderItem */
@@ -42,8 +52,9 @@ class ToOrderItemPlugin
             ];
             if (!empty($p['logo_uid'])) {
                 $additionalOptions[] = [
-                    'label' => 'Logo UID',
-                    'value' => $p['logo_uid'],
+                    'label'       => 'Logo',
+                    'value'       => $this->buildLogoLinkValue($p['logo_uid']),
+                    'custom_view' => true,
                 ];
             }
             if (!empty($p['text_lines']) && is_array($p['text_lines'])) {
@@ -68,5 +79,29 @@ class ToOrderItemPlugin
         $orderItem->setProductOptions($options);
 
         return $orderItem;
+    }
+
+    private function buildLogoLinkValue(string $logoUid): string
+    {
+        $logo = $this->customerLogoFactory->create();
+        $this->customerLogoResource->loadByFileHash($logo, $logoUid);
+
+        if (!$logo->getId() || !$logo->getFilePath()) {
+            return $logoUid;
+        }
+
+        try {
+            $mediaBaseUrl = $this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA);
+        } catch (\Exception) {
+            return $logoUid;
+        }
+
+        $href = $mediaBaseUrl . ltrim($logo->getFilePath(), '/');
+
+        return sprintf(
+            '<a href="%s" target="_blank">%s</a>',
+            htmlspecialchars($href, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($logoUid, ENT_QUOTES, 'UTF-8')
+        );
     }
 }

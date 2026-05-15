@@ -6,6 +6,7 @@ namespace Workwear\Personalization\Model\Resolver;
 
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\ResourceModel\Quote\Item as QuoteItemResource;
 use Magento\QuoteGraphQl\Model\CartItem\DataProvider\UpdateCartItems as UpdateCartItemsDataProvider;
 use Workwear\Personalization\Model\CustomerLogoFactory;
 use Workwear\Personalization\Model\ResourceModel\CustomerLogo as CustomerLogoResource;
@@ -22,6 +23,7 @@ class UpdateCartItemPersonalization
         private readonly CustomerLogoFactory $customerLogoFactory,
         private readonly CustomerLogoResource $customerLogoResource,
         private readonly PositionCollectionFactory $positionCollectionFactory,
+        private readonly QuoteItemResource $quoteItemResource,
     ) {}
 
     /**
@@ -41,6 +43,9 @@ class UpdateCartItemPersonalization
             }
 
             $itemId = (int) ($item['cart_item_id'] ?? 0);
+            if ($itemId === 0 && !empty($item['cart_item_uid'])) {
+                $itemId = (int) base64_decode((string) $item['cart_item_uid']);
+            }
             if ($itemId === 0) {
                 continue;
             }
@@ -54,6 +59,7 @@ class UpdateCartItemPersonalization
 
             if ($personalizations === [] || $personalizations === null) {
                 $cartItem->setData('personalization_data', null);
+                $this->quoteItemResource->save($cartItem);
                 continue;
             }
 
@@ -65,6 +71,7 @@ class UpdateCartItemPersonalization
                 'personalization_data',
                 json_encode($personalizations, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)
             );
+            $this->quoteItemResource->save($cartItem);
         }
     }
 
